@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up – Smart Study Planner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <!-- ── Navbar ── -->
+  <header class="navbar">
+    <a href="{{ url_for('index') }}" class="brand"><span>📚</span> Smart Study Planner</a>
+    <nav>
+      <a href="{{ url_for('login') }}">Login</a>
+    </nav>
+  </header>
+
+  <!-- ── Flash messages ── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── Auth card ── -->
+  <div class="auth-wrapper">
+    <div class="auth-card">
+
+      <div class="auth-head">
+        <div class="icon">✏️</div>
+        <h2>Create Account</h2>
+        <p class="sub">Start planning your studies today</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('signup') }}">
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text"
+                 id="username"
+                 name="username"
+                 placeholder="Choose a username"
+                 required
+                 autocomplete="username" />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email"
+                 id="email"
+                 name="email"
+                 placeholder="your@email.com"
+                 required
+                 autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password"
+                 id="password"
+                 name="password"
+                 placeholder="Min 4 characters"
+                 required
+                 minlength="4"
+                 autocomplete="new-password" />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full mt-2">
+          Create Account →
+        </button>
+
+      </form>
+
+      <p class="auth-footer">
+        Already have an account?
+        <a href="{{ url_for('login') }}">Login</a>
+      </p>
+
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – Smart Study Planner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <!-- ── Navbar ── -->
+  <header class="navbar">
+    <a href="{{ url_for('index') }}" class="brand"><span>📚</span> Smart Study Planner</a>
+    <nav>
+      <a href="{{ url_for('signup') }}">Sign Up</a>
+    </nav>
+  </header>
+
+  <!-- ── Flash messages ── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── Auth card ── -->
+  <div class="auth-wrapper">
+    <div class="auth-card">
+
+      <div class="auth-head">
+        <div class="icon">🔐</div>
+        <h2>Welcome Back</h2>
+        <p class="sub">Log in to your study planner</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('login') }}">
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text"
+                 id="username"
+                 name="username"
+                 placeholder="Enter your username"
+                 required
+                 autocomplete="username" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password"
+                 id="password"
+                 name="password"
+                 placeholder="Enter your password"
+                 required
+                 autocomplete="current-password" />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full mt-2">
+          Login →
+        </button>
+
+      </form>
+
+      <p class="auth-footer">
+        Don't have an account?
+        <a href="{{ url_for('signup') }}">Sign Up</a>
+      </p>
+
+    </div>
+  </div>
+
+</body>
+</html>

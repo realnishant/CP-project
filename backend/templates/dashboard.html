@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – Smart Study Planner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════
+       NAVBAR
+  ═══════════════════════════════════════════════════════════ -->
+  <header class="navbar">
+    <div class="brand"><span>📚</span> Smart Study Planner</div>
+    <nav>
+      <span style="color:rgba(255,255,255,.75);font-size:.88rem;margin-right:.5rem;">
+        👤 {{ session['username'] }}
+      </span>
+      <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </nav>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════
+       FLASH MESSAGES
+  ═══════════════════════════════════════════════════════════ -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ══════════════════════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="container">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div>
+        <h1>📋 My Dashboard</h1>
+        <p class="text-muted">Track your daily study progress</p>
+      </div>
+      <div class="date-badge">📅 {{ today }}</div>
+    </div>
+
+    <!-- ── Stat Cards ── -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">{{ subjects|length }}</div>
+        <div class="stat-label">Subjects Added</div>
+      </div>
+      <div class="stat-card" style="border-color:#059669;">
+        <div class="stat-value" style="color:#059669;">{{ "%.1f"|format(today_hours) }}</div>
+        <div class="stat-label">Hours Today</div>
+      </div>
+      <div class="stat-card" style="border-color:#7c3aed;">
+        <div class="stat-value" style="color:#7c3aed;">
+          {{ "%.1f"|format(summary|sum(attribute='total_hours')) }}
+        </div>
+        <div class="stat-label">Total Hours</div>
+      </div>
+      <div class="stat-card" style="border-color:#d97706;">
+        <div class="stat-value" style="color:#d97706;">{{ recent_sessions|length }}</div>
+        <div class="stat-label">Session Logs</div>
+      </div>
+    </div>
+
+    <!-- ── Two-column grid ── -->
+    <div class="dash-grid">
+
+      <!-- ════════════════════════════════════════
+           LEFT COLUMN  –  Add subject + Log session
+      ═════════════════════════════════════════════ -->
+      <div>
+
+        <!-- Add Subject form -->
+        <div class="card mt-2">
+          <div class="card-header">
+            <h3>➕ Add New Subject</h3>
+          </div>
+          <div class="card-body">
+            <form method="POST" action="{{ url_for('add_subject') }}">
+              <div class="form-group">
+                <label for="subject_name">Subject Name</label>
+                <input type="text"
+                       id="subject_name"
+                       name="subject_name"
+                       placeholder="e.g. Mathematics"
+                       required />
+              </div>
+              <div class="form-group">
+                <label for="daily_goal">Daily Goal (hours)</label>
+                <input type="number"
+                       id="daily_goal"
+                       name="daily_goal"
+                       value="2"
+                       min="0.5" max="12" step="0.5"
+                       required />
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">
+                Add Subject
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Log Study Session form -->
+        <div class="card mt-3">
+          <div class="card-header">
+            <h3>⏱️ Log Study Session</h3>
+          </div>
+          <div class="card-body">
+            {% if subjects %}
+              <form method="POST" action="{{ url_for('log_session') }}">
+
+                <div class="form-group">
+                  <label for="subject_id">Subject</label>
+                  <select id="subject_id" name="subject_id" required>
+                    <option value="" disabled selected>Select a subject</option>
+                    {% for subj in subjects %}
+                      <option value="{{ subj['id'] }}">{{ subj['name'] }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="hours">Hours Studied</label>
+                    <input type="number"
+                           id="hours"
+                           name="hours"
+                           placeholder="e.g. 1.5"
+                           min="0.1" max="24" step="0.1"
+                           required />
+                  </div>
+                  <div class="form-group">
+                    <label for="study_date">Date</label>
+                    <input type="date"
+                           id="study_date"
+                           name="study_date"
+                           value="{{ today }}"
+                           required />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="notes">Notes (optional)</label>
+                  <textarea id="notes"
+                            name="notes"
+                            placeholder="What did you cover today?"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-full">
+                  Log Session ✓
+                </button>
+              </form>
+            {% else %}
+              <div class="no-data">
+                <div class="nd-icon">📭</div>
+                <p>Add a subject first before logging a session.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div><!-- end left column -->
+
+
+      <!-- ════════════════════════════════════════
+           RIGHT COLUMN  –  Subjects list + Progress
+      ═════════════════════════════════════════════ -->
+      <div>
+
+        <!-- Subjects list -->
+        <div class="card mt-2">
+          <div class="card-header">
+            <h3>📚 My Subjects</h3>
+            <span class="badge">{{ subjects|length }}</span>
+          </div>
+          <div class="card-body">
+            {% if subjects %}
+              <div class="subject-list">
+                {% for subj in subjects %}
+                  <div class="subject-item">
+                    <div>
+                      <div class="subj-name">{{ subj['name'] }}</div>
+                      <div class="subj-goal">🎯 Goal: {{ subj['daily_goal'] }} hrs/day</div>
+                    </div>
+                    <a href="{{ url_for('delete_subject', subject_id=subj['id']) }}"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('Delete {{ subj['name'] }} and all its sessions?')">
+                      🗑
+                    </a>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="no-data">
+                <div class="nd-icon">📂</div>
+                <p>No subjects yet. Add one using the form on the left!</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Progress Summary table -->
+        <div class="card mt-3">
+          <div class="card-header">
+            <h3>📈 Progress Summary</h3>
+          </div>
+          <div class="card-body" style="padding:0;">
+            {% if summary %}
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Subject</th>
+                      <th>Total Hours</th>
+                      <th>Daily Goal</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in summary %}
+                      {% set pct = [(row['total_hours'] / (row['daily_goal'] * 7) * 100), 100]|min %}
+                      <tr>
+                        <td><strong>{{ row['name'] }}</strong></td>
+                        <td>
+                          {{ "%.1f"|format(row['total_hours']) }} hrs
+                          <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill" style="width:{{ pct }}%;"></div>
+                          </div>
+                        </td>
+                        <td>{{ row['daily_goal'] }} hrs/day</td>
+                        <td>
+                          {% if row['total_hours'] >= row['daily_goal'] %}
+                            <span class="badge green">On Track ✅</span>
+                          {% elif row['total_hours'] > 0 %}
+                            <span class="badge amber">In Progress</span>
+                          {% else %}
+                            <span class="badge">Not Started</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="no-data">
+                <p>No progress data yet.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      </div><!-- end right column -->
+
+    </div><!-- end dash-grid -->
+
+
+    <!-- ── Matplotlib Graph ── -->
+    <div class="graph-section mt-3">
+      <div class="card-header">
+        <h3>📊 Study Hours Chart</h3>
+        <span class="text-muted" style="font-size:.8rem;">Total hours per subject</span>
+      </div>
+      {% if graph_b64 %}
+        <img src="data:image/png;base64,{{ graph_b64 }}"
+             alt="Study hours bar chart" />
+      {% else %}
+        <div class="no-data" style="padding:3rem;">
+          <div class="nd-icon">📉</div>
+          <p>Log at least one study session to see your chart here.</p>
+        </div>
+      {% endif %}
+    </div>
+
+
+    <!-- ── Recent Sessions Table ── -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <h3>🗒️ Recent Sessions</h3>
+        <span class="badge">Last 10</span>
+      </div>
+      <div class="card-body" style="padding:0;">
+        {% if recent_sessions %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Subject</th>
+                  <th>Hours</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sess in recent_sessions %}
+                  <tr>
+                    <td>{{ sess['study_date'] }}</td>
+                    <td><strong>{{ sess['subject_name'] }}</strong></td>
+                    <td><span class="badge">{{ "%.1f"|format(sess['hours']) }} hrs</span></td>
+                    <td class="text-muted">{{ sess['notes'] if sess['notes'] else '—' }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="no-data" style="padding:2rem;">
+            <p>No sessions logged yet.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div><!-- end .container -->
+
+  <footer>
+    <p>Smart Study Planner &nbsp;·&nbsp; Class 12 Computer Science Project &nbsp;·&nbsp; Built with Python &amp; Flask</p>
+  </footer>
+
+</body>
+</html>

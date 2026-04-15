@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Study Planner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <!-- ── Navbar ── -->
+  <header class="navbar">
+    <div class="brand"><span>📚</span> Smart Study Planner</div>
+    <nav>
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('signup') }}">Sign Up</a>
+    </nav>
+  </header>
+
+  <!-- ── Flash messages ── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── Hero section ── -->
+  <section class="hero">
+    <h1>Plan Smart.<br>Study Smarter.</h1>
+    <p>Track your study sessions, set daily goals, and visualise your progress — all in one place.</p>
+    <div class="hero-buttons">
+      <a href="{{ url_for('signup') }}" class="btn btn-white">🚀 Get Started Free</a>
+      <a href="{{ url_for('login') }}"  class="btn btn-outline">Login</a>
+    </div>
+  </section>
+
+  <!-- ── Feature cards ── -->
+  <section class="features">
+    <h2>Everything you need to stay on track</h2>
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="fc-icon">📖</div>
+        <h3>Add Subjects</h3>
+        <p>Add all your Class 12 subjects and set a daily study goal for each one.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="fc-icon">⏱️</div>
+        <h3>Log Study Hours</h3>
+        <p>Record how many hours you studied each day — it takes just 5 seconds.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="fc-icon">📊</div>
+        <h3>Visual Reports</h3>
+        <p>A bar chart shows your cumulative hours per subject at a glance.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="fc-icon">🔐</div>
+        <h3>Your Own Account</h3>
+        <p>Signup and login — your data stays private and linked to your profile.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>Smart Study Planner &nbsp;·&nbsp; Class 12 Computer Science Project &nbsp;·&nbsp; Built with Python &amp; Flask</p>
+  </footer>
+
+</body>
+</html>
