@@ -264,7 +264,7 @@ const add = async () => {
   };
 
   try {
-    await fetch("http://127.0.0.1:5000/api/subjects", {
+    await fetch("/api/subjects", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -272,7 +272,7 @@ const add = async () => {
       body: JSON.stringify(payload)
     });
 
-    const list = await fetch("http://127.0.0.1:5000/api/subjects");
+    const list = await fetch("/api/subjects");
     const data = await list.json();
      console.log("API DATA =", data);
 
@@ -364,7 +364,7 @@ function LogPage({ subjects, sessions, setSessions }) {
   };
 
   try {
-    await fetch("http://127.0.0.1:5000/api/sessions", {
+    await fetch("/api/sessions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -372,7 +372,7 @@ function LogPage({ subjects, sessions, setSessions }) {
       body: JSON.stringify(payload)
     });
 
-    const res = await fetch("http://127.0.0.1:5000/api/sessions");
+    const res = await fetch("/api/sessions");
     const data = await res.json();
 
     setSessions(
@@ -601,14 +601,14 @@ export default function App() {
  const [sessions, setSessions] = useState([]);
 
   useEffect(() => {
-  fetch("http://127.0.0.1:5000/api/test")
+  fetch("/api/test")
     .then(res => res.json())
     .then(data => setBackendMsg(data.message))
     .catch(err => console.log(err));
 }, []);
 
 useEffect(() => {
-  fetch("http://127.0.0.1:5000/api/subjects")
+  fetch("/api/subjects")
     .then(res => res.json())
    .then(data =>
   setSubjects(
@@ -624,7 +624,7 @@ useEffect(() => {
 
 
 useEffect(() => {
-  fetch("http://127.0.0.1:5000/api/sessions")
+  fetch("/api/sessions")
     .then(res => res.json())
     .then(data =>
       setSessions(
