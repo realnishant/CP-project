@@ -594,9 +594,6 @@ if __name__ == '__main__':
 
 
 
-@app.route("/")
-def home():
-    return send_from_directory("static", "index.html")
 
 @app.route("/<path:path>")
 def static_proxy(path):
