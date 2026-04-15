@@ -548,7 +548,7 @@ function AuthScreen({ onLogin }) {
         <div style={{ fontFamily: 'Syne', fontSize: 36, fontWeight: 800, letterSpacing: '-.04em', lineHeight: 1.1, marginBottom: 20 }}>
           Plan your<br /><span style={{ color: 'var(--accent)' }}>study</span> better.
         </div>
-        <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.8, maxWidth: 320 }}>Track hours, set goals, and visualise your progress with a clean dashboard built for Class XII.</p>
+        <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.8, maxWidth: 320 }}>Track hours, set goals, and visualise your progress with a clean dashboard built for Students.</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 36 }}>
           {['Track subjects & daily goals', 'Log study sessions in seconds', 'Charts & progress analytics'].map(f => (
             <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
